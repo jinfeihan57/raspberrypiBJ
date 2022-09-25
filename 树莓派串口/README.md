@@ -203,6 +203,7 @@ pi@raspberrypi:~/gpio $
 
 测试代码如下
 
+```
 pi@raspberrypi:~ $ python
 Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 [GCC 10.2.1 20210110] on linux
@@ -224,5 +225,6 @@ uart2.read(10)#当不知道写入多少时，读取将会是非常困难的事�
 b'hellow ras'
 uart2.read(9)
 b'pberrypi\n'
+```
 
 可以同时开两个终端，两个终端的串口设置保持一致。就可以两个终端互相收发消息。注意读是阻塞的（如果读取的数量小于写入的数量则阻塞一直等到足够的数量读函数才返回）。
