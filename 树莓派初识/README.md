@@ -88,3 +88,27 @@ ping -4 raspberrypi.local
 ![](./ssh3.png)
 
 以上操作为没有屏幕，并且没有有线网络时的方法。即便你有屏幕和网线也推荐你采用此种方法。
+
+### 更换软件源
+
+由于树莓派官方软件源服务器在美国，在国内使用比较慢。可以更换国内一些组织搞的镜像源比如阿里，163，华为等等，我这里演示的是清华大学的。（各个镜像源因为同步周期的问题会出现小概率的同一个软件版本不一致）
+
+1 打开[清华大学开源软件镜像站树莓派页面](https://mirror.tuna.tsinghua.edu.cn/help/raspbian/)
+
+![](./tsinghuaimg.png)
+
+查看自己树莓派的版本：aarch64 bullseye
+
+![](./raspversion.png)
+
+并在镜像站选择自己树莓派的版本
+
+![](./imgsources.png)
+
+根据只是提示copy对应的行，替换掉对应文件即可。完成后执行：
+
+```
+sudo apt-get update # 可以看到源都是清华的了
+```
+
+![](./update.png)
