@@ -108,6 +108,98 @@ True
 1
 >>> pi.stop()
 >>> exit()
+```
 
+## 串口通信
+
+pigpio支持硬件串口通信，需要提前打开树莓派的串口。打开方式参见[树莓派串口](https://github.com/jinfeihan57/raspberrypiBJ/tree/main/%E6%A0%91%E8%8E%93%E6%B4%BE%E4%B8%B2%E5%8F%A3)。pigpio实现了硬件的串口通信，但是硬件的串口通信是有数量（在树莓派4B之前的版本，树莓派3和3+上都是稀缺资源）的并且要求使用指定的 io 口。因此pigpio同时实现了软件串口（bb_serial_read_open）通信的读，**仅支持读**。推荐使用硬件的串口，支持更多的设置，可判断待读信息的大小。
+
+串口2自通信接线图
+
+![](./串口2自通信.jpg)
+
+```
+pi@raspberrypi:~ $ python
+Python 3.9.2 (default, Feb 28 2021, 17:03:44)
+[GCC 10.2.1 20210110] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import pigpio
+>>> pi = pigpio.pi()
+>>> pi.connected
+True
+>>> u2 = pi.serial_open("/dev/ttyAMA1", 19200)
+>>> pi.serial_write(u2, b"hello u2")
+0
+>>> (c, d) = pi.serial_read(u2, 100)
+>>> print(c)
+8
+>>> print(d)
+bytearray(b'hello u2')
+>>> pi.serial_write(u2, "hello u2")
+0
+>>> (c, d) = pi.serial_read(u2, 100)
+>>> print(c)
+8
+>>> print(d)
+bytearray(b'hello u2')
+>>> pi.serial_write(u2, "hello u2")
+0
+>>> pi.serial_data_available(u2)
+8
+>>> (c, d) = pi.serial_read(u2, 8)
+>>> print(d)
+bytearray(b'hello u2')
+>>> pi.serial_write_byte(u2, 96)
+0
+>>> pi.serial_data_available(u2)
+1
+>>> (c, d) = pi.serial_read(u2, 1)
+>>> print(c)
+1
+>>> print(d)
+bytearray(b'`')
+>>> pi.serial_close(u2)
+0
+>>> pi.stop()
+>>> exit()
+pi@raspberrypi:~ $
+```
+
+采用模拟串口接收功能实现任意gpio的串口读功能，读出的结果被存放在一个环形缓存中（具体缓存大小待测）。
+
+串口2发送信息，gpio26接受信息接线图
+
+![](./串口2tx_io26rx.jpg)
+
+```
+pi@raspberrypi:~ $ python
+Python 3.9.2 (default, Feb 28 2021, 17:03:44)
+[GCC 10.2.1 20210110] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import pigpio
+>>> pi = pigpio.pi()
+>>> pi.connected
+True
+>>> u2 = pi.serial_open("/dev/ttyAMA1", 19200)
+>>> rxio = 26
+>>> pi.bb_serial_read_open(rxio, 19200)
+0
+>>> pi.serial_write(u2, b'hello gpio26')
+0
+>>> (c, d) = pi.bb_serial_read(rxio)
+>>> print(c)
+12
+>>> print(d)
+bytearray(b'hello gpio26')
+>>> pi.serial_write_byte(u2, 0)
+0
+>>> (c, d) = pi.bb_serial_read(rxio)
+>>> print(c)
+1
+>>> print(d)
+bytearray(b'\x00')
+>>> pi.stop()
+>>> exit()
+pi@raspberrypi:~ $
 ```
 
