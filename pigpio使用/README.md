@@ -2,7 +2,7 @@
 
 关于树莓派的GPIO使用，网上有大量资料都过于老旧。
 
-pigpio是一个较为新的树莓派gpio控制库，但是这个库的使用资料都比较简单，或者上来就教大家pwm波的使用。因此我想再此做一个基础系统的pigpio库的使用方法。
+pigpio是一个较为新的树莓派gpio控制库，但是这个库的使用资料都比较简单，几乎都是一手资料。因此我想再此做一个基础系统的pigpio库的使用方法。
 
 文档主要以python语言为主做pigpio的介绍媒介。
 
@@ -201,5 +201,66 @@ bytearray(b'\x00')
 >>> pi.stop()
 >>> exit()
 pi@raspberrypi:~ $
+```
+
+## I2C通信
+
+想要i2c通信首先要打开树莓派的i2c通信。
+
+```
+sudo raspi-config
+-->3 Interface Options    Configure connections to peripherals
+   -->I5 I2C           Enable/disable automatic loading of I2C kernel module
+      -->YES
+```
+
+开启后无需重启即可在/dev 目录下多出一个i2c设备总线1，设备20和21都是系统使用的i2c总线，不是我们开启的。
+
+![](../树莓派IIC/iicdev.png)
+
+查看i2c,总线上挂载的设备，每个设备都在总线上有一个地址。0x00-0xFF，0x00不能使用所以最多挂载127个设备。
+
+```
+pi@raspberrypi:~ $ sudo apt-get install -y i2c-tools #安装i2c工具
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+i2c-tools is already the newest version (4.2-1+b1).
+i2c-tools set to manually installed.
+The following package was automatically installed and is no longer required:
+  libfuse2
+Use 'sudo apt autoremove' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+pi@raspberrypi:~ $ sudo i2cdetect -y 20 # 查看i2c 20总线上的设备
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         08 09 0a 0b 0c 0d 0e 0f
+10: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f
+20: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
+30: -- -- -- -- -- -- -- -- 38 39 3a 3b 3c 3d 3e 3f
+40: 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: 60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f
+70: 70 71 72 73 74 75 76 77
+pi@raspberrypi:~ $ sudo i2cdetect -y 21
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         08 09 0a 0b 0c 0d 0e 0f
+10: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f
+20: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
+30: -- -- -- -- -- -- -- -- 38 39 3a 3b 3c 3d 3e 3f
+40: 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: 60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f
+70: 70 71 72 73 74 75 76 77
+pi@raspberrypi:~ $ sudo i2cdetect -y 1 # 查看我们打开的i2c 1总线上的设备，因为我还没有接线因此没有设备
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+
 ```
 
