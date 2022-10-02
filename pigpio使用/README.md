@@ -216,7 +216,7 @@ sudo raspi-config
 
 开启后无需重启即可在/dev 目录下多出一个i2c设备总线1，这里默认打开的是i2c总线1(其他总线的开启方式参见[串口的开启方式](https://github.com/jinfeihan57/raspberrypiBJ/tree/main/%E6%A0%91%E8%8E%93%E6%B4%BE%E4%B8%B2%E5%8F%A3#raspberrypi-4b-%E4%B8%B2%E5%8F%A3%E4%BD%BF%E7%94%A8))。设备20和21都是系统使用的i2c总线，不是我们开启的。
 
-![](../树莓派IIC/iicdev.png)
+![](./iicdev.png)
 
 查看i2c,总线上挂载的设备，每个设备都在总线上有一个地址。0x00-0xFF，0x00不能使用所以最多挂载127个设备。
 
@@ -280,4 +280,14 @@ pi@raspberrypi:~  $ sudo i2cdetect -y 1
 70: -- -- -- -- -- -- -- --
 ```
 
-官网的i2c，有很多的api。但是我手上的i2c 1602液晶屏没法都验证。只能验证基本的接口即i2c写接口。其他接口使用方法差异不大。具体代码详见。
+官网的i2c，有很多的api。但是我手上的i2c 1602液晶屏没法都验证。只能验证基本的接口即i2c写接口。其他接口使用方法差异不大。
+
+[具体代码详见](https://github.com/jinfeihan57/raspberrypiBJ/blob/main/%E6%A0%91%E8%8E%93%E6%B4%BEIIC/IIC1602.py)
+
+i2c1602 接线图
+
+![](./1602I2C_4线通信.png)
+
+i2c1602与树莓派接线图
+
+![](./i2c1602接线.jpg)
