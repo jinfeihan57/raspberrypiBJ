@@ -114,6 +114,7 @@ if __name__ == '__main__':
         print("pigpio connect failed.")
         exit()
     display = I2c1602Display(pi)
+    #display = I2c1602Display(pi, 1, 4)
     # 第二个参数1表示打开LCD背光，若是0则关闭背光
     display.DisPlay(3, 0, 'Hello')  #3，0参数指显示的起始位置为第3列，第0行
     display.DisPlay(3, 1, 'pigpio i2c!') #3，1参数指显示的起始位置为第3列，第1行

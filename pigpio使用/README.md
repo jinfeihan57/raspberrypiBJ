@@ -291,3 +291,47 @@ i2c1602 接线图
 i2c1602与树莓派接线图
 
 ![](./i2c1602接线.jpg)
+
+### 其他i2c总线的使用
+
+开启i2c总线4（总线3与总线1默认io口一样），在/boot/config.txt 文件末尾加
+
+```
+dtoverlay=i2c4
+```
+
+然后重启，查看i2c bus4
+
+![](./i2cbus4.png)
+
+查看i2c总线4的io管脚和已连接的设备
+
+```
+pi@raspberrypi:~ $ dtoverlay -h i2c4
+Name:   i2c4
+
+Info:   Enable the i2c4 bus. BCM2711 only.
+
+Usage:  dtoverlay=i2c4,<param>
+
+Params: pins_6_7                Use GPIOs 6 and 7
+        pins_8_9                Use GPIOs 8 and 9 (default) #默认io 8SDA 9SCL
+        baudrate                Set the baudrate for the interface (default
+                                "100000")
+
+pi@raspberrypi:~ $ sudo i2cdetect -y 4 #接线后
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- 27 -- -- -- -- -- -- -- -- #液晶屏幕已经接入 i2c 总线4
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+pi@raspberrypi:~ $
+```
+
+注释[代码](https://github.com/jinfeihan57/raspberrypiBJ/blob/main/%E6%A0%91%E8%8E%93%E6%B4%BEIIC/IIC1602.py)中的116行，释放117行
+
+![](./i2cbus4_1602接线.jpg)
