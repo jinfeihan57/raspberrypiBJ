@@ -4,10 +4,10 @@ import time
 class I2c1602Display():
     '''I2C 1602液晶显示器驱动'''
     def __init__(self, pi, blen = 1, i2cBus = 1, addr = 0x27):
-        self.pi = pi
+        self._pi = pi
         self._addr = addr
         self._blen = blen
-        self._handle = pi.i2c_open(i2cBus, self._addr)
+        self._handle = self._pi.i2c_open(i2cBus, self._addr)
         print(self._handle)
         try:
             self.SendCommand(0x33) # 必须先初始化为8行模式   110011 Initialise
@@ -27,9 +27,9 @@ class I2c1602Display():
         else:
             print('i2c init success!')
 
-    def __del__(self):
-        pi.i2c_close(self._handle)
-        print('close 1602')
+#    def __del__(self):
+#        self._pi.i2c_close(self._handle)
+#        print('close 1602')
     
     def WriteByte(self, bData):
         temp = bData
@@ -37,7 +37,7 @@ class I2c1602Display():
             temp |= 0x08  #0x08=0000 1000，表开背光
         else:
             temp &= 0xF7  #0xF7=1111 0111，表关闭背光
-        pi.i2c_write_byte(self._handle, temp)
+        self._pi.i2c_write_byte(self._handle, temp)
     
     def SendCommand(self, cmd):
         # Send bit7-4 firstly
@@ -108,6 +108,11 @@ class I2c1602Display():
     def MoveRight(self):
         self.SendCommand(0x1C)
 
+    def CloseDisplay(self):
+        self.Clear()
+        self._pi.i2c_close(self._handle)
+        print('close 1602')
+
 if __name__ == '__main__':
     pi = pigpio.pi()
     if not pi.connected:
@@ -130,4 +135,9 @@ if __name__ == '__main__':
         i += 1
 
     display.Clear()
-    del display
+    display.CloseDisplay()
+
+#    由于pi会提前析构导致del失败，因此需要手动closedisplay，或者让pi的生命周期更久些
+#    del display
+#    pi.connected
+
