@@ -27,7 +27,7 @@ pigpio是一个较为新的树莓派gpio控制库，但是这个库的使用资�
 
 采用源码安装（命令行安装的方式自行百度）
 
-```
+```shell
 git clone https://github.com/joan2937/pigpio.git -b v79 #我做整理的时候最新版本是这个，后续有新的建议用最新的
 cd pigpio
 make
@@ -42,7 +42,7 @@ sudo pigpiod #启动pigpio后台服务，否则后续的测试会失败
 
 使用pigpio的时候，需要保证后台进程pigpiod是在运行的。
 
-```
+```shell
 sudo systemctl enable pigpiod
 ```
 
@@ -56,7 +56,7 @@ sudo systemctl enable pigpiod
 
 由于是第一次使用我会详细介绍每一行，
 
-```
+```python
 pi@raspberrypi:~/gpio/pigpio-79 $ python
 Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 [GCC 10.2.1 20210110] on linux
@@ -84,7 +84,7 @@ True
 
 这里因为没有复位按键可以直接采用管脚接地和接高电平测试。
 
-```
+```python
 pi@raspberrypi:~/gpio/pigpio-79 $ python
 Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 [GCC 10.2.1 20210110] on linux
@@ -110,6 +110,50 @@ True
 >>> exit()
 ```
 
+## GPIO绑定回调函数
+
+pigpio支持gpio绑定回调函数。在GPIO电平变换时(开关)，被调用类似终端机制。
+
+```python
+pi@raspberrypi:~ $ python
+Python 3.9.2 (default, Feb 28 2021, 17:03:44)
+[GCC 10.2.1 20210110] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+>>> import pigpio
+>>> pi = pigpio.pi()
+>>> pi.connected
+True
+>>> def iocallbak(gpio, level, tick): # 回调函数，三个入参 gpio管脚，电平0/1，内置的时钟
+...     print('hello iocallbak')
+...     print('{0}, {1}'.format(gpio, level))
+...
+>>> pi.set_mode(17, pigpio.INPUT) # 设置gpio 17为输入
+0
+>>> pi.set_pull_up_down(17, pigpio.PUD_UP) # 内置拉高
+0
+>>> pi.set_glitch_filter(17, 100) # 毛刺滤波时间单位是微秒10 -6，设置为10000体验更好
+0
+>>> pi.callback(17, pigpio.EITHER_EDGE, iocallbak) # io17 绑定回调函数，触发条件为双电平均可
+<pigpio._callback object at 0x7f88df6070>
+>>> hello iocallbsk	# 由于我没有开关键使用的时杜邦线，导致拔插时毛刺较多，可以看到回调函数被执行多次
+17, 0
+hello iocallbak
+17, 1
+hello iocallbak
+17, 0
+hello iocallbak
+17, 1
+hello iocallbak
+17, 0
+hello iocallbak
+17, 1
+
+>>> pi.stop()
+>>> exit()
+pi@raspberrypi:~ $
+```
+
 ## 串口通信
 
 pigpio支持硬件串口通信，需要提前打开树莓派的串口。打开方式参见[树莓派串口](https://github.com/jinfeihan57/raspberrypiBJ/tree/main/%E6%A0%91%E8%8E%93%E6%B4%BE%E4%B8%B2%E5%8F%A3)。pigpio实现了硬件的串口通信，但是硬件的串口通信是有数量（在树莓派4B之前的版本，树莓派3和3+上都是稀缺资源）的并且要求使用指定的 io 口。因此pigpio同时实现了软件串口（bb_serial_read_open）通信的读，**仅支持读**。推荐使用硬件的串口，支持更多的设置，可判断待读信息的大小。
@@ -118,7 +162,7 @@ pigpio支持硬件串口通信，需要提前打开树莓派的串口。打开�
 
 ![](./串口2自通信.jpg)
 
-```
+```python
 pi@raspberrypi:~ $ python
 Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 [GCC 10.2.1 20210110] on linux
@@ -171,7 +215,7 @@ pi@raspberrypi:~ $
 
 ![](./串口2tx_io26rx.jpg)
 
-```
+```python
 pi@raspberrypi:~ $ python
 Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 [GCC 10.2.1 20210110] on linux
@@ -220,7 +264,7 @@ sudo raspi-config
 
 查看i2c,总线上挂载的设备，每个设备都在总线上有一个地址。0x00-0xFF，0x00不能使用所以最多挂载127个设备。
 
-```
+```shell
 pi@raspberrypi:~ $ sudo apt-get install -y i2c-tools #安装i2c工具
 Reading package lists... Done
 Building dependency tree... Done
@@ -267,7 +311,7 @@ pi@raspberrypi:~ $ sudo i2cdetect -y 1 # 查看我们打开的i2c 1总线上的�
 
 SDA接GPIO2，SCL接GPIO3.  i2c总线1可以发现设备 0x27（1602液晶屏的默认地址），说明接线没有问题。
 
-```
+```shell
 pi@raspberrypi:~  $ sudo i2cdetect -y 1
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 00:                         -- -- -- -- -- -- -- --
@@ -306,7 +350,7 @@ dtoverlay=i2c4
 
 查看i2c总线4的io管脚和已连接的设备
 
-```
+```shell
 pi@raspberrypi:~ $ dtoverlay -h i2c4
 Name:   i2c4
 
