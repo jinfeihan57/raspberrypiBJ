@@ -112,7 +112,7 @@ True
 
 ## GPIO绑定回调函数
 
-pigpio支持gpio绑定回调函数。在GPIO电平变换时(开关)，被调用类似终端机制。
+pigpio支持gpio绑定回调函数。在GPIO电平变换时(开关)，被调用类似中断机制。也可以用来采集脉冲输入。
 
 ```python
 pi@raspberrypi:~ $ python
