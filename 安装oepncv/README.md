@@ -32,3 +32,22 @@ Type "help", "copyright", "credits" or "license" for more information.
 pi@raspberrypi:~ $
 ```
 
+## 优化opencv
+
+此时opencv虽然能用，但是可能存在摄像头视频延时高，有卡顿等问题。
+
+解决方案：
+
+```
+#安装libv4l-dev库
+sudo apt-get install libv4l-dev
+#安装 opencv-contrib-python
+pip install opencv-contrib-python
+```
+
+## cv2验证
+
+```
+python opencv2camera.py
+```
+
